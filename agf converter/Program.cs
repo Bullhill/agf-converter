@@ -66,15 +66,16 @@ foreach (string file in agfFiles)
 
 
     string encodedString = String.Empty;
+    string fieldName = string.Empty;
 
     XmlDocument doc = new XmlDocument();
     try
     {
         doc.Load(extractFolder + "\\" + FileFirstName + ".xml");
-        XmlNode? boundaries = doc.GetElementsByTagName("field")[0];
-        if (boundaries != null)
+        XmlNode? Field= doc.GetElementsByTagName("field")[0];
+        if (Field != null)
         {
-            XmlNode? boundariesNode = boundaries["boundaries"];
+            XmlNode? boundariesNode = Field["boundaries"];
             if (boundariesNode != null)
             {
                 foreach (XmlNode boundary in boundariesNode.ChildNodes)
@@ -84,6 +85,10 @@ foreach (string file in agfFiles)
                         encodedString = geometry.InnerText;
                 }
             }
+            XmlNode? fieldNameXml = Field["name"];
+            if (fieldNameXml != null)
+                fieldName = fieldNameXml.InnerText;
+
         }
     }
     catch
@@ -120,7 +125,7 @@ foreach (string file in agfFiles)
         writer.WriteStartDocument();
         writer.WriteStartElement("", "kml", "http://www.opengis.net/kml/2.2");
         writer.WriteStartElement("Placemark");
-        writer.WriteElementString("name", "Hasseljordet Midt");
+        writer.WriteElementString("name", fieldName);
         writer.WriteStartElement("Polygon");
         writer.WriteStartElement("outerBoundaryIs");
         writer.WriteStartElement("LinearRing");
