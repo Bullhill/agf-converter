@@ -120,7 +120,7 @@ foreach (string file in agfFiles)
     }
 
 
-    using (XmlWriter writer = XmlWriter.Create(extractFolder + "\\" + FileFirstName + ".kml", new XmlWriterSettings() { Indent = true, IndentChars = "  " }))
+    using (XmlWriter writer = XmlWriter.Create(folder + "\\" + FileFirstName + ".kml", new XmlWriterSettings() { Indent = true, IndentChars = "  " }))
     {
         writer.WriteStartDocument();
         writer.WriteStartElement("", "kml", "http://www.opengis.net/kml/2.2");
