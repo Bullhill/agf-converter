@@ -30,6 +30,8 @@ foreach(string file in agfFiles)
         if (ivXmlElement == null)
             throw (new Exception("Cant find iv"));
 
+        /* https://www.thecombineforum.com/threads/import-files-from-gfx750-into-sms-basic.336677/page-2 */
+
         string uuid = uuidXmlElement.InnerText;
         string iv = ivXmlElement.InnerText;
         byte[] uuidhex = StringToByteArray(uuid.Replace("-", ""));
