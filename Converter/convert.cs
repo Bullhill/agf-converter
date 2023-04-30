@@ -38,7 +38,15 @@ namespace Converter
             byte[] uuidhex = StringToByteArray(uuid.Replace("-", ""));
             byte[] numArray = StringToByteArray(HexKey);
 
-            byte[] key = exclusiveOR(uuidhex, numArray);
+            byte[] key;
+            try
+            {
+                key = exclusiveOR(uuidhex, numArray);
+            }
+            catch
+            {
+                return false;
+            }
 
             Aes aes = Aes.Create();
             aes.BlockSize = 128;
@@ -48,15 +56,22 @@ namespace Converter
             
             byte[] encFile = File.ReadAllBytes(outputFolder + "\\" + uuid + ".xml.gz.enc");
 
-            using (MemoryStream ms = new MemoryStream(encFile))
+            try
             {
-                using (CryptoStream cs = new CryptoStream(ms, decryptor, CryptoStreamMode.Read))
+                using (MemoryStream ms = new MemoryStream(encFile))
                 {
-                    var decompressor = new System.IO.Compression.GZipStream(cs, System.IO.Compression.CompressionMode.Decompress);
-                    FileStream outputFileStream = File.Create(outputFolder + "\\" + uuid + ".xml");
-                    decompressor.CopyTo(outputFileStream);
-                    outputFileStream.Close();
+                    using (CryptoStream cs = new CryptoStream(ms, decryptor, CryptoStreamMode.Read))
+                    {
+                        var decompressor = new System.IO.Compression.GZipStream(cs, System.IO.Compression.CompressionMode.Decompress);
+                        FileStream outputFileStream = File.Create(outputFolder + "\\" + uuid + ".xml");
+                        decompressor.CopyTo(outputFileStream);
+                        outputFileStream.Close();
+                    }
                 }
+            }
+            catch
+            {
+                return false;
             }
 
             return true;

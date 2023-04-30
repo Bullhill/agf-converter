@@ -6,7 +6,12 @@
     <Nullable>enable</Nullable>
     <UseWPF>true</UseWPF>
     <UseWindowsForms>true</UseWindowsForms>
+    <ApplicationIcon>recovery_convert_icon_241031.ico</ApplicationIcon>
   </PropertyGroup>
+
+  <ItemGroup>
+    <Content Include="recovery_convert_icon_241031.ico" />
+  </ItemGroup>
 
   <ItemGroup>
     <PackageReference Include="CoordinateSharp" Version="2.17.1.1" />

@@ -72,46 +72,67 @@ namespace Converter
         }
         private void ConvertButton_Click(object sender, RoutedEventArgs e)
         {
-            if(SelectedFiles.Count > 0 && EncryptionKey.Text.Length > 0 && Directory.Exists(OutputFolder) && convert.TryStringToByteArray(EncryptionKey.Text))
+            if (SelectedFiles.Count == 0)
             {
-                foreach(SelectedFile file in SelectedFiles)
+                System.Windows.Forms.MessageBox.Show("No files selected!", "No files selected", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                return;
+            }
+            if (EncryptionKey.Text.Length == 0)
+            {
+                System.Windows.Forms.MessageBox.Show("Encryption key missing", "No key", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                return;
+            }
+            if (!convert.TryStringToByteArray(EncryptionKey.Text))
+            {
+                System.Windows.Forms.MessageBox.Show("Encryption key not valid", "Invalid key", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                return;
+            }
+            if (!Directory.Exists(OutputFolder))
+            {
+                System.Windows.Forms.MessageBox.Show("Output folder does not exsists", "No missing", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                return;
+            }
+
+
+            foreach(SelectedFile file in SelectedFiles)
+            {
+                if (File.Exists(file.FileName))
                 {
-                    if (File.Exists(file.FileName))
+
+                    if (Directory.Exists(OutputFolder + "/" + file.FileFirstName))
                     {
-
-                        if (Directory.Exists(OutputFolder + "/" + file.FileFirstName))
+                        if (System.Windows.Forms.MessageBox.Show($"Outputfolder {file.FileFirstName} allready exsist, Do you want to overwrite?", "Confirmation", MessageBoxButtons.YesNo, MessageBoxIcon.Warning) == System.Windows.Forms.DialogResult.No)
                         {
-                            if (System.Windows.Forms.MessageBox.Show($"Outputfolder {file.FileFirstName} allready exsist, Do you want to overwrite?", "Confirmation", MessageBoxButtons.YesNo, MessageBoxIcon.Warning) == System.Windows.Forms.DialogResult.No)
-                            {
-                                return;
-                            }
-                            Directory.Delete(OutputFolder + "/" + file.FileFirstName, true);
+                            return;
                         }
-                        file.Status = SelectedFile.StatusList.UnZipping;
-                        updateSelectedFilesList();
-                        convert.Unzip(file.FileName, OutputFolder + "/" + file.FileFirstName);
-                        file.Status = SelectedFile.StatusList.UnZipped;
-                        updateSelectedFilesList();
-
-                        file.Status = SelectedFile.StatusList.DeCrypting;
-                        updateSelectedFilesList();
-                        convert.Decrypt(OutputFolder + "/" + file.FileFirstName, EncryptionKey.Text);
-                        file.Status = SelectedFile.StatusList.DeCrypted;
-                        updateSelectedFilesList();
-
-                        file.DecodeGeometry(OutputFolder + "/" + file.FileFirstName + "/" + file.FileFirstName + ".xml");
-                        updateSelectedFilesList();
-
-                        file.CreateKML(OutputFolder + "/" + file.FieldName + ".kml");
-                        updateSelectedFilesList();
-                        file.Status = SelectedFile.StatusList.Complete;
-                        updateSelectedFilesList();
-
-
-
+                        Directory.Delete(OutputFolder + "/" + file.FileFirstName, true);
                     }
+                    file.Status = SelectedFile.StatusList.UnZipping;
+                    updateSelectedFilesList();
+                    convert.Unzip(file.FileName, OutputFolder + "/" + file.FileFirstName);
+                    file.Status = SelectedFile.StatusList.UnZipped;
+                    updateSelectedFilesList();
+
+                    file.Status = SelectedFile.StatusList.DeCrypting;
+                    updateSelectedFilesList();
+                    if(!convert.Decrypt(OutputFolder + "/" + file.FileFirstName, EncryptionKey.Text))
+                    {
+                        file.Status = SelectedFile.StatusList.DeCryptFailed;
+                        return;
+                    }
+                    file.Status = SelectedFile.StatusList.DeCrypted;
+                    updateSelectedFilesList();
+
+                    file.DecodeGeometry(OutputFolder + "/" + file.FileFirstName + "/" + file.FileFirstName + ".xml");
+                    updateSelectedFilesList();
+
+                    file.CreateKML(OutputFolder + "/" + file.FieldName + ".kml");
+                    updateSelectedFilesList();
+                    file.Status = SelectedFile.StatusList.Complete;
+                    updateSelectedFilesList();
                 }
             }
+            
         }
     }
 }
