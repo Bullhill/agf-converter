@@ -117,7 +117,8 @@ namespace Converter
                 writer.WriteStartElement("Polygon");
                 writer.WriteStartElement("outerBoundaryIs");
                 writer.WriteStartElement("LinearRing");
-                writer.WriteElementString("coordinates", String.Join(" ", Coordinates));
+
+                writer.WriteElementString("coordinates", String.Join(" ", Coordinates.Select(s => s.Longitude.DecimalDegree.ToString() + "," + s.Latitude.DecimalDegree.ToString())));
                 writer.WriteEndElement();
                 writer.WriteEndElement();
                 writer.WriteEndElement();
