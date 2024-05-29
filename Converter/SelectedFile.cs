@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Globalization;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -108,6 +109,8 @@ namespace Converter
         public void CreateKML(string OutputFile)
         {
             Status = StatusList.CreatingKML;
+            NumberFormatInfo nfi = new NumberFormatInfo();
+            nfi.NumberDecimalSeparator = ",";
             using (XmlWriter writer = XmlWriter.Create(OutputFile, new XmlWriterSettings() { Indent = true, IndentChars = "  " }))
             {
                 writer.WriteStartDocument();
@@ -118,7 +121,7 @@ namespace Converter
                 writer.WriteStartElement("outerBoundaryIs");
                 writer.WriteStartElement("LinearRing");
 
-                writer.WriteElementString("coordinates", String.Join(" ", Coordinates.Select(s => s.Longitude.DecimalDegree.ToString() + "," + s.Latitude.DecimalDegree.ToString())));
+                writer.WriteElementString("coordinates", String.Join(" ", Coordinates.Select(s => s.Longitude.DecimalDegree.ToString(nfi) + "," + s.Latitude.DecimalDegree.ToString(nfi))));
                 writer.WriteEndElement();
                 writer.WriteEndElement();
                 writer.WriteEndElement();
